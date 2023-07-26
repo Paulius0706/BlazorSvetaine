@@ -28,61 +28,29 @@ else
         <button class="col-3 btn btn-secondary" @onclick="AddSelectedUser">Add Selected User</button>
     </div>
 
-    
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th style="max-width: 20%">
-                    Time
-                </th>
-                @foreach (User user in users)
-                {
-                    <th>
-                        <div class="row">
-                            <button class="col-2 btn btn-secondary" @onclick="@(() => {ShiftTo(user.Id, -1);})">Right</button>
-                            <button class="col-6 btn btn-light" >@user.Name</button>
-                            <button class="col-2 btn btn-danger" @onclick="@(() => {DeleteSelectedUser(user.Id);})">Delete</button>
-                            <button class="col-2 btn btn-secondary" @onclick="@(() => {ShiftTo(user.Id,  1);})">Left</button>
-                        </div>
-                        
-                    </th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="min-height: 800px;">
-                @foreach (User user in users){
-                    <td style="min-height: 800px;">
-                        
-                    </td>
-                }
-            </tr>
-            @*@for(int timeIndex = 6 * 4; timeIndex < 22 * 4; timeIndex++){
-                int time = timeIndex;
-                <tr class="user-select-none">
-                    <th width="@((users.Count+1)/100)%">@IndexToTime(timeIndex)</th>
-                    @for(int index=0; index< users.Count;index++)
-                    {
-                        int i = index;
-                        <td
-                            class="user-select-none"
-                            style="@Paint(time,i)"
-                            width="@((users.Count+1)/100)%"
-                            @onmousemove="@((e) =>Select(e,time,i))">
+    <div class="border" style="min-height: 800px">
+        <div class="border" style="width: 20%; height: 100%; float:left;">
+            <div class="row p-0 m-0">
+                <button class="col-12 btn btn-light"><i class="fa fa-clock"></i></button>
+                <div class="border w-100" style="min-height: 800px;">
+                </div>
+            </div>
+        </div>
+        @foreach (User user in users)
+        {
+            <div class="border" style="width: @(80/users.Count)%; height: 100%;  float:left;">
+                <div class="row p-0 m-0">
+                    <button class="col-2 btn btn-secondary" @onclick="@(() => {ShiftTo(user.Id, -1);})"><i class="fa fa-arrow-left"></i></button>
+                    <button class="col-6 btn btn-light" disabled>@user.Name</button>
+                    <button class="col-2 btn btn-danger" @onclick="@(() => {DeleteSelectedUser(user.Id);})"><i class="fa fa-trash"></i></button>
+                    <button class="col-2 btn btn-secondary" @onclick="@(() => {ShiftTo(user.Id,  1);})"><i class="fa fa-arrow-right"></i></button>
+                </div>
+                <div class="border w-100" style="min-height: 800px;">
 
-                            @if(isReserveTimeStart(time,i))
-                            {
-                                <div class="row">
-
-                                </div>
-                            }
-
-                        </td>
-                    }
-                </tr>
-            }*@
-        </tbody>
-    </table>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 
