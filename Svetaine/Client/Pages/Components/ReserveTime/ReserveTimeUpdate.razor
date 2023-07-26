@@ -1,0 +1,81 @@
+﻿@inject HttpClient Http
+@inject Fetcher Fetcher
+
+<div class="modal" style="display: @CreateModalDisplayStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update User</h5>
+                <button class="btn btn-close" @onclick="ModalSet"> </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        @Message
+                    </div>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <td>
+                            <input class="form-control" @bind="User.Name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Email
+                        </th>
+                        <td>
+                            <input class="form-control" @bind="User.Email"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Password
+                        </th>
+                        <td>
+                            <input class="form-control disabled" @bind="User.Password"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" @onclick="@(() => {UpdateEntity();})">Update</button>
+                <button class="btn btn-secondary" @onclick="ModalSet">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Action Render { get; set; }
+    public ReserveTime ReserveTime { get; set; } = new ReserveTime();
+    public User User { get; set; } = new User();
+    string Message  = "";
+
+    string CreateModalDisplayStyle = "none";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReserveTime = new ReserveTime();
+        User = new User();
+    }
+    public async void ModalSet()
+    {
+        CreateModalDisplayStyle = CreateModalDisplayStyle == "none" ? "block" : "none";
+        StateHasChanged();
+    }
+    public async void UpdateEntity()
+    {
+        Message = await Fetcher.PutRequest<ReserveTime>(Http, ReserveTime);
+        if (Message == "")
+        {
+            ReserveTime = new ReserveTime();
+            ModalSet();
+        }
+        Render.Invoke();
+    }
+}

@@ -1,0 +1,82 @@
+﻿@using Svetaine.Shared
+@using Svetaine.Shared.DbModels
+@inject HttpClient Http
+@inject Fetcher Fetcher
+
+<div class="modal" style="display: @CreateModalDisplayStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete User</h5>
+                <button class="btn btn-close" @onclick="ModalSet"> </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        @Message
+                    </div>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <td>
+                            <input class="form-control" @bind="User.Name" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Email
+                        </th>
+                        <td>
+                            <input class="form-control" @bind="User.Email" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Password
+                        </th>
+                        <td>
+                            <input class="form-control disabled" @bind="User.Password" readonly/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" @onclick="@(() => {DeleteEntity();})">Delete</button>
+                <button class="btn btn-secondary" @onclick="ModalSet">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Action Render { get; set; }
+    public User User { get; set; } = new User();
+    string Message { get; set; } = "";
+
+
+    string CreateModalDisplayStyle = "none";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = new User();
+    }
+    public async void ModalSet()
+    {
+        CreateModalDisplayStyle = CreateModalDisplayStyle == "none" ? "block" : "none";
+        StateHasChanged();
+    }
+    public async void DeleteEntity()
+    {
+        Message = await Fetcher.DeleteRequest<User>(Http, User);
+        if (Message == "")
+        {
+            User = new User();
+            ModalSet();
+        }
+        Render.Invoke();
+    }
+}

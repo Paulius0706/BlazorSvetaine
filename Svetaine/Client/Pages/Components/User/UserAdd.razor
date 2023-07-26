@@ -1,0 +1,74 @@
+﻿@using Svetaine.Shared
+@using Svetaine.Shared.DbModels
+@inject HttpClient Http
+@inject Fetcher Fetcher
+
+
+
+<div class="modal" style="display: @CreateModalDisplayStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create User</h5>
+                <button class="btn btn-close" @onclick="ModalSet"> </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        @Message
+                    </div>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>Name</th>
+                        <td><input class="form-control" @bind="User.Name" /></td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td><input class="form-control" @bind="User.Email" /></td>
+
+                    </tr>
+                    <tr>
+                        <th>Password</th>
+                        <td><input class="form-control" @bind="User.Password" /></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" @onclick="@(() => {AddEntity();})">Create</button>
+                <button class="btn btn-secondary" @onclick="ModalSet">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter] public Action Render { get; set; }
+    User User { get; set; } = new User();
+    string Message { get; set; } = "";
+
+    string CreateModalDisplayStyle = "none";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = new User();
+    }
+    public async void ModalSet()
+    {
+        CreateModalDisplayStyle = CreateModalDisplayStyle == "none" ? "block" : "none"; 
+        StateHasChanged();
+    }
+
+    public async void AddEntity()
+    {
+        var res = await Fetcher.PostRequest<User>(Http, User);
+        Message = res.Item1;
+        if (Message == "") 
+        {
+            User = new User();
+            ModalSet(); 
+        }
+
+        Render.Invoke();
+    }
+}

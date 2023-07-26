@@ -1,0 +1,109 @@
+﻿@using Svetaine.Shared
+@using Svetaine.Shared.DbModels
+@inject HttpClient Http
+@inject Fetcher Fetcher
+
+
+
+<div class="modal" style="display: @CreateModalDisplayStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create User</h5>
+                <button class="btn btn-close" @onclick="ModalSet"> </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        @Message
+                    </div>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>Costumer</th>
+                        <td><input class="form-control" @bind="ReserveTime.CostumerName" /></td>
+                    </tr>
+                    <tr>
+                        <th>Phone</th>
+                        <td><input class="form-control" @bind="ReserveTime.CostumerPhone" /></td>
+
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td><input class="form-control" @bind="ReserveTime.Price" /></td>
+                    </tr>
+                    <tr>
+                        <th>Service Type</th>
+                        <td><input class="form-control" @bind="ReserveTime.ServiceType" /></td>
+                    </tr>
+                    <tr>
+                        <th>Day</th>
+                        <td><input type="date" class="form-control" @bind="date" /></td>
+                    </tr>
+                    <tr>
+                        <th>Password</th>
+                        <td><input type="time" class="form-control" @bind="time" /></td>
+                    </tr>
+                    <tr>
+                        <th>Password</th>
+                        <td><input type="time" class="form-control" @bind="duration" /></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" @onclick="@(() => {AddEntity();})">Create</button>
+                <button class="btn btn-secondary" @onclick="ModalSet">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter] public Action Render { get; set; }
+
+    public User User { get; set; }
+    DateTime time { get; set; } = new DateTime();
+    DateTime duration { get; set; } = new DateTime();
+    DateTime date { get; set; } = new DateTime();
+
+    ReserveTime ReserveTime { get; set; } = new ReserveTime();
+    string Message { get; set; } = "";
+
+    string CreateModalDisplayStyle = "none";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReserveTime = new ReserveTime();
+    }
+    public async void ModalSet(User user, DateTime date, DateTime time, DateTime duration)
+    {
+        this.User = user;
+        this.date = date;
+        this.time = time;
+        this.duration = duration;
+
+        CreateModalDisplayStyle = CreateModalDisplayStyle == "none" ? "block" : "none";
+        StateHasChanged();
+    }
+    public async void ModalSet()
+    {
+        CreateModalDisplayStyle = CreateModalDisplayStyle == "none" ? "block" : "none";
+        StateHasChanged();
+    }
+
+    public async void AddEntity()
+    {
+        ReserveTime.TimeSize = duration.Hour * 4 + duration.Minute / 15;
+        ReserveTime.Day = int.Parse(date.ToString("yyyyMMdd"));
+        ReserveTime.TimeIndex = time.Hour * 4 + time.Minute / 15;
+        var res = await Fetcher.PostRequest<User,ReserveTime>(Http,User, ReserveTime);
+        Message = res.Item1;
+        if (Message == "")
+        {
+            ReserveTime = new ReserveTime();
+            ModalSet();
+        }
+
+        Render.Invoke();
+    }
+}
